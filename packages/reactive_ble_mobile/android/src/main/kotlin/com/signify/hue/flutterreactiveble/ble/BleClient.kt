@@ -61,6 +61,13 @@ interface BleClient {
         value: ByteArray,
     ): Single<CharOperationResult>
 
+    fun writeCharacteristicLong(
+        deviceId: String,
+        characteristicId: UUID,
+        characteristicInstanceId: Int,
+        value: ByteArray,
+    ): Single<CharOperationResult>
+
     fun negotiateMtuSize(
         deviceId: String,
         size: Int,

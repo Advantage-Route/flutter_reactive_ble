@@ -157,6 +157,14 @@ abstract class ReactiveBlePlatform extends PlatformInterface {
         'writeCharacteristicWithoutResponse has not been implemented.');
   }
 
+  Future<WriteCharacteristicInfo> writeCharacteristicLong(
+    CharacteristicInstance characteristic,
+    List<int> value,
+  ) {
+    throw UnimplementedError(
+        'writeCharacteristicLong has not been implemented.');
+  }
+
   /// Starts subscribing to notifications for a specified characteristic.
   ///
   /// This stream only returns the result of the operation. Value updates should
