@@ -200,6 +200,15 @@ class FlutterReactiveBle {
     await (await resolveSingle(characteristic)).write(value, withResponse: false);
   }
 
+  Future<void> writeCharacteristicLong(
+    QualifiedCharacteristic characteristic, {
+    required List<int> value,
+  }) async {
+    await initialize();
+    await (await resolveSingle(characteristic))
+        .writeLong(value, withResponse: false);
+  }
+
   /// Request a specific MTU for a connected device.
   ///
   /// Returns the actual MTU negotiated.
@@ -529,6 +538,12 @@ class Characteristic {
     } else {
       await _lib._connectedDeviceOperator.writeCharacteristicWithoutResponse(_ids, value: value);
     }
+  }
+
+  Future<void> writeLong(List<int> value, {bool withResponse = true}) async {
+    _assertValidity();
+    await _lib._connectedDeviceOperator
+        .writeCharacteristicLong(_ids, value: value);
   }
 
   /// Subscribes to updates from the characteristic specified.

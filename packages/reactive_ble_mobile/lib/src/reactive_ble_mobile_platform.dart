@@ -203,6 +203,24 @@ class ReactiveBleMobilePlatform extends ReactiveBlePlatform {
   }
 
   @override
+  Future<WriteCharacteristicInfo> writeCharacteristicLong(
+    CharacteristicInstance characteristic,
+    List<int> value,
+  ) async {
+    _logger?.log(
+      'Write long to $characteristic, value: $value',
+    );
+    return _bleMethodChannel
+        .invokeMethod<List<int>>(
+          "writeCharacteristicLong",
+          _argsToProtobufConverter
+              .createWriteCharacteristicRequest(characteristic, value)
+              .writeToBuffer(),
+        )
+        .then((data) => _protobufConverter.writeCharacteristicInfoFrom(data!));
+  }
+
+  @override
   Stream<void> subscribeToNotifications(
     CharacteristicInstance characteristic,
   ) {

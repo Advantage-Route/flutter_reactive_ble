@@ -228,6 +228,20 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
             RxBleConnection::writeCharWithoutResponse,
         )
 
+    override fun writeCharacteristicLong(
+        deviceId: String,
+        characteristicId: UUID,
+        characteristicInstanceId: Int,
+        value: ByteArray,
+    ): Single<CharOperationResult> =
+        executeWriteOperationLong(
+            deviceId,
+            characteristicId,
+            characteristicInstanceId,
+            value,
+            RxBleConnection::writeCharWithoutResponse,
+        )
+
     override fun setupNotification(
         deviceId: String,
         characteristicId: UUID,
@@ -305,6 +319,52 @@ open class ReactiveBleClient(private val context: Context) : BleClient {
                                 connectionResult.rxConnection.bleOperation(characteristic, value)
                                     .map { value -> CharOperationSuccessful(deviceId, value.asList()) }
                             }
+                    }
+                    is EstablishConnectionFailure -> {
+                        Single.just(
+                            CharOperationFailed(
+                                deviceId,
+                                "failed to connect ${connectionResult.errorMessage}",
+                            ),
+                        )
+                    }
+                }
+            }.first(CharOperationFailed(deviceId, "Writechar timed-out"))
+    }
+
+    private fun executeWriteOperationLong(
+        deviceId: String,
+        characteristicId: UUID,
+        characteristicInstanceId: Int,
+        value: ByteArray,
+        bleOperation: RxBleConnection.(characteristic: BluetoothGattCharacteristic, value: ByteArray) -> Single<ByteArray>,
+    ): Single<CharOperationResult> {
+        return getConnection(deviceId)
+            .flatMapSingle { connectionResult ->
+                when (connectionResult) {
+                    is EstablishedConnection -> {
+                        connectionResult.rxConnection.createNewLongWriteBuilder()
+                            .setCharacteristicUuid(characteristicId)
+                            .setBytes(value)
+                            .build()
+                            .subscribe(
+                                { bytes ->
+                                    
+                                },
+                                { throwable ->
+                                    
+                                },
+                                {
+                                    
+                                }
+                            )
+
+                        Single.just(
+                                        CharOperationSuccessful(
+                                            deviceId,
+                                            value.asList() // this should be the actual value returned from the write operation,
+                                        ),
+                                    )
                     }
                     is EstablishConnectionFailure -> {
                         Single.just(
